@@ -59,7 +59,7 @@ min: if the captured value is LESS than this int, then we have an error state
 #Service
 You'll probably want to set this up as a service under systemctl.  Here's an example:  
 /etc/systemd/system/crowsnest.service  
---------------------------------------------------------------------------  
+=======================================================================
 [Unit]  
 Description=CrowsNest Web server monitor  
 After=network.target  
@@ -74,7 +74,7 @@ Restart=on-abort
   
 [Install]  
 WantedBy=multi-user.target  
---------------------------------------------------------------------------  
+=======================================================================
 Based on this you'd want to have your CrowsNest binary and .json files in the same directory.  In this case /home/NateDogg/crowsnest  
 
 #Testing
