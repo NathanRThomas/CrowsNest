@@ -61,7 +61,6 @@ func main() {
 	wg := new(sync.WaitGroup)
 	wg.Add(1)
 	
-	
 	//this handles killing the service gracefully
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

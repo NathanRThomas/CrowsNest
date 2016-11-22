@@ -1,0 +1,7 @@
+[
+    {"alias":"Api Backend", "url":"https://api.backend.com","interval":1, "class":1,
+    "errors":[{"alias":"This is bad when it's higher", "regex":"\\nUsers: (\\d+)", "max":60},
+            {"alias":"Site Down", "regex":"Things look good!", "missing":true}],
+    "warnings":[{"alias":"This could be bad when it's higher", "regex":"\\nUsers: (\\d+)", "max":30}]
+    }
+]
