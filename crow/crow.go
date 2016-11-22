@@ -125,6 +125,27 @@ func (c *Crow_c) Init () (error) {
         return fmt.Errorf("Please add at least one crew member")
     }
     
+    //now do the squawk file
+    configFile, err = os.Open("squawk.json") //try the file
+    
+	if err == nil {
+        defer configFile.Close()
+		jsonParser := json.NewDecoder(configFile)
+		err = jsonParser.Decode(&c.crowSquawk.Config)
+	} else {
+        return fmt.Errorf("Unable to open 'squawk.json' file :: " + err.Error())
+    }
+    
+    if err != nil {
+        return fmt.Errorf("squawk.json file appears invalid :: " + err.Error())
+    } else if len(c.crowSquawk.Config.Plivo.AuthID) < 1 {
+        return fmt.Errorf("Plivo auth_id is not set")
+    } else if len(c.crowSquawk.Config.Plivo.Number) < 1 {
+        return fmt.Errorf("Plivo number is not set")
+    } else if len(c.crowSquawk.Config.Plivo.Token) < 1 {
+        return fmt.Errorf("Plivo token is not set")
+    }
+    
     return nil  //we're good
 }
 

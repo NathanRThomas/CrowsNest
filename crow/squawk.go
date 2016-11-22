@@ -10,11 +10,19 @@ import (
     "github.com/toomore/plivo-go"
     )
 
-const plivo_number  = "13308660084"
-const plivo_auth_id = "MAOTY3N2Q1N2IYOGVMYZ"
-const plivo_token   = "MzY2MjgwMWNmOTU1MzY4YTRkNzgyODNkYjY0MjZk"
+type squawk_plivo_t struct {
+    Number      string      `json:"number"`
+    AuthID      string      `json:"auth_id"`
+    Token       string      `json:"token"`
+}
 
-type crow_squawk_c struct {}
+type squawk_config_t struct {
+    Plivo       squawk_plivo_t  `json:"plivo"`
+}
+
+type crow_squawk_c struct {
+    Config      squawk_config_t
+}
 
 //-------------------------------------------------------------------------------------------------------------------------//
 //----- PRIVATE FUNCTIONS -------------------------------------------------------------------------------------------------//
@@ -28,11 +36,11 @@ type crow_squawk_c struct {}
  */
 func (s crow_squawk_c) SendSquawk (c crew_t, message string) {
     //init our account
-    account := &plivo.Account{ User: plivo_auth_id, Password: plivo_token }
+    account := &plivo.Account{ User: s.Config.Plivo.AuthID, Password: s.Config.Plivo.Token }
     
     if len(c.Phone) > 0 {
         fmt.Printf("Sending text message to %s\n", c.Alias)
-        msg := plivo.NewMessage(c.Phone, plivo_number, message, account)
+        msg := plivo.NewMessage(c.Phone, s.Config.Plivo.Number, message, account)
         msg.Send()
     }
 }

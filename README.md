@@ -14,9 +14,14 @@ as well as:
 go get github.com/toomore/plivo-go  
 
 
-This requires two files:  
+This requires three files:  
+squawk.json  
 crew.json  
 eggs.json  
+
+#squawk.json
+This contains the information required to send messages.  ie the authentication information
+{"plivo":{"number":"18005551234", "auth_id":"AUTHID", "token":"TOKEN"}}  
 
 #crew.json
 Contains a list of all members of the crew that we would want to send a notification to  
@@ -59,7 +64,7 @@ min: if the captured value is LESS than this int, then we have an error state
 #Service
 You'll probably want to set this up as a service under systemctl.  Here's an example:  
 /etc/systemd/system/crowsnest.service  
-=======================================================================
+
 [Unit]  
 Description=CrowsNest Web server monitor  
 After=network.target  
@@ -74,7 +79,7 @@ Restart=on-abort
   
 [Install]  
 WantedBy=multi-user.target  
-=======================================================================
+
 Based on this you'd want to have your CrowsNest binary and .json files in the same directory.  In this case /home/NateDogg/crowsnest  
 
 #Testing
