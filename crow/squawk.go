@@ -50,7 +50,7 @@ func (s crow_squawk_c) Squawk (crew []crew_t, badEgg egg_t, err, warn error) (er
         return nil  //we shouldn't get here
     }
     
-    fmt.Println(message)    //write this to screen
+    //fmt.Println(message)    //write this to screen
     
     //now go through and send our messages
     for _, c := range(crew) {

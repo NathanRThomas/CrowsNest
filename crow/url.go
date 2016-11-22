@@ -40,7 +40,7 @@ func (u crow_url_c) domain (inUrl string) (err error) {
 func (u crow_url_c) regexCapture (cur capture_t, html string) (error) {
     if len(cur.Regex) > 0 {
         match := regexp.MustCompile(cur.Regex)
-        resp2 := match.FindStringSubmatch(html)
+        //resp2 := match.FindStringSubmatch(html)
         //fmt.Println(cur.Regex, resp2)
         
         if cur.Exists || cur.Missing {
