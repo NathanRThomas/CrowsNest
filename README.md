@@ -19,6 +19,9 @@ squawk.json
 crew.json  
 eggs.json  
 
+These files can be local to the working directory of the service, or you can set the environment variable 
+"CROWSNEST_CONFIG_DIR" to the directory these files are located  
+
 #squawk.json
 This contains the information required to send messages.  ie the authentication information
 {"plivo":{"number":"18005551234", "auth_id":"AUTHID", "token":"TOKEN"}}  

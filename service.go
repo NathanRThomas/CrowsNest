@@ -26,6 +26,8 @@ import (
 	"github.com/NathanRThomas/CrowsNest/crow"
 )
 
+const APP_VER = "0.1"
+
 //-------------------------------------------------------------------------------------------------------------------------//
 //----- PRIVATE FUNCTIONS -------------------------------------------------------------------------------------------------//
 //-------------------------------------------------------------------------------------------------------------------------//
@@ -39,14 +41,26 @@ func main() {
 	
 	//handle any passed in flags
 	squawkTest := flag.String("testsquawk", "", "Alias of the crew member to send a squawk to")
+	versionFlag := flag.Bool("v", false, "Returns the version")
+	testFlag := flag.Bool("t", false, "Runs a test to make sure the config files are all set.  Then exits")
 	
 	flag.Parse()
+	
+	if *versionFlag {
+		fmt.Printf("\nCrowsNest Version: %s\n\n", APP_VER)
+		os.Exit(0)
+	}
 	
 	crowService := crow.Crow_c {}
 	err := crowService.Init()
 	
 	if err != nil {	//see if we initalized correctly
 		fmt.Println(err)
+		os.Exit(0)
+	}
+	
+	if *testFlag {	//if we're here, it's cause we initialzed correctly, and we're done
+		fmt.Printf("\nCrowsNest configuration looks good!\n")
 		os.Exit(0)
 	}
 	

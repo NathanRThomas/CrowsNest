@@ -74,20 +74,22 @@ func (c Crow_c) validateRegex (in string) {
 /*! \brief Main entry point.  This will read our config files and make sure we can start running
  */
 func (c *Crow_c) Init () (error) {
+    //see if the user set a environment varible for the path location
+    configPath := os.Getenv("CROWSNEST_CONFIG_DIR")
     
     //Read in the eggs
-    configFile, err := os.Open("eggs.json") //try the file
+    configFile, err := os.Open(configPath + "eggs.json") //try the file
     
 	if err == nil {
         defer configFile.Close()
 		jsonParser := json.NewDecoder(configFile)
 		err = jsonParser.Decode(&c.eggs)
 	} else {
-        return fmt.Errorf("Unable to open 'eggs.json' file :: " + err.Error())
+        return fmt.Errorf("Unable to open '%seggs.json' file :: " + err.Error(), configPath)
     }
     
     if err != nil {
-        return fmt.Errorf("eggs.json file appears invalid :: " + err.Error())
+        return fmt.Errorf("%seggs.json file appears invalid :: " + err.Error(), configPath)
     } else if len(c.eggs) < 1 {
         return fmt.Errorf("Please add at least one egg to your nest")
     }
@@ -109,35 +111,35 @@ func (c *Crow_c) Init () (error) {
     }
     
     //now do the crew
-    configFile, err = os.Open("crew.json") //try the file
+    configFile, err = os.Open(configPath + "crew.json") //try the file
     
 	if err == nil {
         defer configFile.Close()
 		jsonParser := json.NewDecoder(configFile)
 		err = jsonParser.Decode(&c.crew)
 	} else {
-        return fmt.Errorf("Unable to open 'crew.json' file :: " + err.Error())
+        return fmt.Errorf("Unable to open '%screw.json' file :: " + err.Error(), configPath)
     }
     
     if err != nil {
-        return fmt.Errorf("crew.json file appears invalid :: " + err.Error())
+        return fmt.Errorf("%screw.json file appears invalid :: " + err.Error(), configPath)
     } else if len(c.crew) < 1 {
         return fmt.Errorf("Please add at least one crew member")
     }
     
     //now do the squawk file
-    configFile, err = os.Open("squawk.json") //try the file
+    configFile, err = os.Open(configPath + "squawk.json") //try the file
     
 	if err == nil {
         defer configFile.Close()
 		jsonParser := json.NewDecoder(configFile)
 		err = jsonParser.Decode(&c.crowSquawk.Config)
 	} else {
-        return fmt.Errorf("Unable to open 'squawk.json' file :: " + err.Error())
+        return fmt.Errorf("Unable to open '%ssquawk.json' file :: " + err.Error(), configPath)
     }
     
     if err != nil {
-        return fmt.Errorf("squawk.json file appears invalid :: " + err.Error())
+        return fmt.Errorf("%ssquawk.json file appears invalid :: " + err.Error(), configPath)
     } else if len(c.crowSquawk.Config.Plivo.AuthID) < 1 {
         return fmt.Errorf("Plivo auth_id is not set")
     } else if len(c.crowSquawk.Config.Plivo.Number) < 1 {
@@ -150,13 +152,15 @@ func (c *Crow_c) Init () (error) {
 }
 
 /*! \brief Default entry point.  This will check all the eggs that need to be checked at this interval
+ *I'm keeping seperate err and warn messages, so we can track that something has gone from a warning state, to an error
+ *state and that we need to send a new message to alert the user that the state has gotten worse
  */
 func (c *Crow_c) CheckAllEggs () {
     //var err error
-    c.elapsedIntervals++    //ramp the interval
+    c.elapsedIntervals++    //ramp the interval, this is used as a global counter
     
     for idx, e := range (c.eggs) {    //loop through all the eggs we're supposed to be watching
-        if c.elapsedIntervals % e.Interval == 0 {   //this is in our interval window
+        if c.elapsedIntervals % e.Interval == 0 {   //this is in our interval window for this specific egg
             err, warn := c.crowUrl.Check(e) //do everything we need to do for this egg
             //fmt.Println("error: ", err, "  warning: ", warn)
             

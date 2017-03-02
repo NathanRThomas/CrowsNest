@@ -23,13 +23,18 @@ type crow_url_c struct {}
 /*! \brief Validates the domain of a url we want to check
  *  ie a dns lookup
  */
-func (u crow_url_c) domain (inUrl string) (err error) {
+func (u crow_url_c) domain (inUrl string, retries int) (err error) {
     parts, _ := url.Parse(inUrl)    //ignore the error, we've already checked this
     
     addrs, err := net.LookupHost (parts.Host)
     if err == nil {
         if len(addrs) < 1 {
             err = fmt.Errorf(`Url "%s" didn't resolve to any ip address`, inUrl)
+        }
+    } else {    //this sometimes times out, to avoid flapping and false positives, i'm doing a retry
+        retries--
+        if retries > 0 {
+            return u.domain(inUrl, retries)
         }
     }
     return
@@ -91,7 +96,7 @@ func (u crow_url_c) Check (egg egg_t) (err, warn error) {
     if len(egg.Url) < 4 { return }   //we don't have a url to check
     
     //check the domain
-    err = u.domain(egg.Url)
+    err = u.domain(egg.Url, 3)  //try 3 times
     if err == nil {
         //now get the page as a request
         resp, err := http.Get(egg.Url)
