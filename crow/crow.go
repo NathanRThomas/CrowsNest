@@ -26,6 +26,7 @@ type egg_t struct {
     Url             string  `json:"url"`
     Interval        int     `json:"interval"`
     Class           int     `json:"class"`
+    Threshold       int     `json:"threshold"`
     Errors          []capture_t  `json:"errors"`
     Warnings        []capture_t  `json:"warnings"`
 }
@@ -37,13 +38,16 @@ type crew_t struct {
     ClassMask       int     `json:"class_mask"`
 }
 
+type eggState_t struct {
+    err, warn   bool
+    errCnt, warnCnt int
+}
+
 type Crow_c struct {
     eggs                []egg_t
     crew                []crew_t
     elapsedIntervals    int
-    errEggs             map[int]bool
-    warnEggs            map[int]bool
-    
+    eggStates           []eggState_t
     crowUrl             crow_url_c       //this checks the urls for us for issues
     crowSquawk          crow_squawk_c   //this handles notifing the crew of an issue
 }
@@ -95,11 +99,8 @@ func (c *Crow_c) Init () (error) {
     }
     
     //now that we got our eggs, do a quick check to ensure that the settings are valid
-    c.errEggs = make(map[int]bool, 0)
-    c.warnEggs = make(map[int]bool, 0)
-    for idx, e := range (c.eggs) {
-        c.errEggs[idx] = false
-        c.warnEggs[idx] = false
+    c.eggStates = make([]eggState_t, len(c.eggs))   //init our states array, keeps track of the eggs locally
+    for _, e := range (c.eggs) {
         c.validateUrl(e.Url)
         for _, errs := range (e.Errors) {
             c.validateRegex(errs.Regex)
@@ -165,20 +166,25 @@ func (c *Crow_c) CheckAllEggs () {
             //fmt.Println("error: ", err, "  warning: ", warn)
             
             if err != nil {
-                if c.errEggs[idx] == false {    //make sure we haven't already sent out the message
-                    c.errEggs[idx] = true
-                    c.warnEggs[idx] = false
-                    c.crowSquawk.Squawk(c.crew, e, err, nil)
+                if c.eggStates[idx].err == false {    //make sure we haven't already sent out the message
+                    c.eggStates[idx].errCnt += 1    //ramp the error count
+                    if c.eggStates[idx].errCnt >= e.Threshold { //check to see if we're past our threshold for this error
+                        c.eggStates[idx].err = true
+                        c.eggStates[idx].warn = false
+                        c.crowSquawk.Squawk(c.crew, e, err, nil)
+                    }
                 }
             } else if warn != nil { //make sure we haven't already sent out the message
-                if c.errEggs[idx] == false && c.warnEggs[idx] == false {
-                    c.warnEggs[idx] = true
-                    c.crowSquawk.Squawk(c.crew, e, nil, warn)
+                if c.eggStates[idx].err == false && c.eggStates[idx].warn == false {
+                    c.eggStates[idx].warnCnt += 1    //ramp the warning count
+                    if c.eggStates[idx].warnCnt >= e.Threshold { //check to see if we're past our threshold for this error
+                        c.eggStates[idx].warn = true
+                        c.crowSquawk.Squawk(c.crew, e, nil, warn)
+                    }
                 }
             } else {
                 //this egg is healthy, mark it as such
-                c.errEggs[idx] = false
-                c.warnEggs[idx] = false
+                c.eggStates[idx] = eggState_t{} //empty struct defaults it
             }
         }
     }
