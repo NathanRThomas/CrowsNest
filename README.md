@@ -115,7 +115,7 @@ journalctl -eu crowsnest
 
 ## License
 
-This project is licensed under the [MIT License](https://raw.githubusercontent.com/NathanRThomas/analytics/master/LICENSE)
+This project is licensed under the [MIT License](https://raw.githubusercontent.com/nathanrthomas/crowsnest/master/LICENSE)
 
 ## Todo
 Email is not in place yet, that's on the to-do list  
