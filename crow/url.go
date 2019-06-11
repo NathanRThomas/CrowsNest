@@ -16,8 +16,8 @@ import (
 
 type crow_url_c struct {}
 
-//-------------------------------------------------------------------------------------------------------------------------//
-//----- PRIVATE FUNCTIONS -------------------------------------------------------------------------------------------------//
+  //-------------------------------------------------------------------------------------------------------------------------//
+ //----- PRIVATE FUNCTIONS -------------------------------------------------------------------------------------------------//
 //-------------------------------------------------------------------------------------------------------------------------//
 
 /*! \brief Validates the domain of a url we want to check
@@ -44,49 +44,52 @@ func (u crow_url_c) domain (inUrl string, retries int) (err error) {
  */
 func (u crow_url_c) regexCapture (cur capture_t, html string) (error) {
     if len(cur.Regex) > 0 {
-        match := regexp.MustCompile(cur.Regex)
-        //resp2 := match.FindStringSubmatch(html)
-        //fmt.Println(cur.Regex, resp2)
-        
-        if cur.Exists || cur.Missing {
-            resp := match.FindStringIndex(html)
-            if cur.Exists && len(resp) != 0 {
-                return fmt.Errorf(`%s: exists: %s`, cur.Alias, cur.Regex)
-            } else if cur.Missing && len(resp) == 0 {
-                return fmt.Errorf(`%s: missing '%s'`, cur.Alias, cur.Regex)
-            }
-        } else {
-            resp := match.FindStringSubmatch(html)
-            if len(resp) > 0 {
-                if cur.Exists { //this exists and shouldn't
-                    return fmt.Errorf(`%s: exists: %s`, cur.Alias, cur.Regex)
-                }
-                
-                //see if we can turn this into an int
-                val, err := strconv.Atoi(resp[1])
-                if err == nil {
-                    if val > cur.Max {
-                        return fmt.Errorf(`%s value %d exceeds limit %d`, cur.Alias, val, cur.Max)
-                    } else if val < cur.Min {
-                        return fmt.Errorf(`%s value %d below  limit %d`, cur.Alias, val, cur.Min)
-                    }
-                }
-            } else {    //we couldn't find it, see if that's bad
-                if cur.Missing {
-                    return fmt.Errorf(`%s: missing '%s'`, cur.Alias, cur.Regex)
-                } else if !cur.Exists {
-                    return fmt.Errorf(`%s: regex error, could not parse, '%s'`, cur.Alias, cur.Regex)
-                }
-                
-            }
-        }
+		if len(html) > 0 {
+			match := regexp.MustCompile(cur.Regex)
+			//resp2 := match.FindStringSubmatch(html)
+			//fmt.Println(cur.Regex, resp2)
+			
+			if cur.Exists || cur.Missing {
+				resp := match.FindStringIndex(html)
+				if cur.Exists && len(resp) != 0 {
+					return fmt.Errorf(`%s: exists: %s`, cur.Alias, cur.Regex)
+				} else if cur.Missing && len(resp) == 0 {
+					return fmt.Errorf(`%s: missing '%s'`, cur.Alias, cur.Regex)
+				}
+			} else {
+				resp := match.FindStringSubmatch(html)
+				if len(resp) > 0 {
+					if cur.Exists { //this exists and shouldn't
+						return fmt.Errorf(`%s: exists: %s`, cur.Alias, cur.Regex)
+					}
+					
+					//see if we can turn this into an int
+					val, err := strconv.Atoi(resp[1])
+					if err == nil {
+						if val > cur.Max {
+							return fmt.Errorf(`%s value %d exceeds limit %d`, cur.Alias, val, cur.Max)
+						} else if val < cur.Min {
+							return fmt.Errorf(`%s value %d below  limit %d`, cur.Alias, val, cur.Min)
+						}
+					}
+				} else {    //we couldn't find it, see if that's bad
+					if cur.Missing {
+						return fmt.Errorf(`%s: missing '%s'`, cur.Alias, cur.Regex)
+					} else if !cur.Exists {
+						return fmt.Errorf(`%s: regex error, could not parse, '%s'`, cur.Alias, cur.Regex)
+					}
+					
+				}
+			}
+		} else {
+			return fmt.Errorf("%s: no page body returned", cur.Alias)
+		}
     }
-    
     return nil
 }
 
-//-------------------------------------------------------------------------------------------------------------------------//
-//----- PUBLIC FUNCTIONS -------------------------------------------------------------------------------------------------//
+  //-------------------------------------------------------------------------------------------------------------------------//
+ //----- PUBLIC FUNCTIONS --------------------------------------------------------------------------------------------------//
 //-------------------------------------------------------------------------------------------------------------------------//
 
 /*! \brief Main entry point
@@ -109,16 +112,14 @@ func (u crow_url_c) Check (egg egg_t) (err, warn error) {
                 
                 //look for errors first, these are worst
                 for _, cur := range (egg.Errors) {
-                    err = u.regexCapture (cur, html)
-                    if err != nil {
+                    if err = u.regexCapture (cur, html); err != nil {
                         return err, warn
                     }
                 }
                 
                 //now do the warnings
                 for _, cur := range (egg.Warnings) {
-                    warn = u.regexCapture (cur, html)
-                    if warn != nil {
+                    if warn = u.regexCapture (cur, html); warn != nil {
                         return err, warn
                     }
                 }
@@ -129,6 +130,5 @@ func (u crow_url_c) Check (egg egg_t) (err, warn error) {
             return err, nil
         }
     }
-    
     return
 }
