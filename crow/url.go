@@ -127,6 +127,7 @@ func (u crow_url_c) Check (egg egg_t) (err, warn error) {
                 return err, nil
             }
         } else {
+			fmt.Println(resp)
             return err, nil
         }
     }

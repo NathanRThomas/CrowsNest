@@ -22,11 +22,11 @@ import (
 	"time"
 	"sync"
 	"flag"
-	
+
 	"github.com/NathanRThomas/CrowsNest/crow"
 )
 
-const APP_VER = "0.3"
+const APP_VER = "0.4"
 
   //-------------------------------------------------------------------------------------------------------------------------//
  //----- PRIVATE FUNCTIONS -------------------------------------------------------------------------------------------------//
@@ -50,7 +50,7 @@ func main() {
 		fmt.Printf("\nCrowsNest Version: %s\n\n", APP_VER)
 		os.Exit(0)
 	}
-	
+
 	crowService := crow.Crow_c {}
 	err := crowService.Init()
 	

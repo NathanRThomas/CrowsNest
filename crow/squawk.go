@@ -10,14 +10,17 @@ import (
     "github.com/NathanRThomas/plivo-go"
     )
 
-type squawk_plivo_t struct {
-    Number      string      `json:"number"`
-    AuthID      string      `json:"auth_id"`
-    Token       string      `json:"token"`
-}
-
 type squawk_config_t struct {
-    Plivo       squawk_plivo_t  `json:"plivo"`
+    Plivo       struct {
+		Number, Token string
+		AuthID      string      `json:"auth_id"`
+	}
+	Slack		struct {
+		Username, Token string
+	}
+	Twilio		struct {
+		SID, Token, Number, ShortToken string
+	}
 }
 
 type crow_squawk_c struct {
