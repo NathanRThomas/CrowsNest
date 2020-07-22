@@ -97,5 +97,5 @@ func main() {
 	
 	crowService.CheckAllEggs()	//call this right away, as the ticker will fire it in 1 minute
 	
-	wg.Wait()	//wait for the slave and possible master to finish
+	wg.Wait()	//wait for the subordinate and possible main to finish
 }
